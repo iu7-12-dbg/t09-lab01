@@ -6,7 +6,7 @@ from graph.dijkstra import *
 class TestArc(unittest.TestCase):
     def test_create(self):
         for i in range(10):
-            a, b, c = random.random(), random.random(), random.random()
+            a, b, c = random.random() * 100, random.random() * 100, random.random() * 100
             arc = Arc(a, b, c)
             self.assertEqual(a, arc.a())
             self.assertEqual(b, arc.b())
