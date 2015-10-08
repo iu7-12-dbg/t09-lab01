@@ -16,6 +16,16 @@ class Arc:
     def __iter__(self):
         return [self.__a, self.__b].__iter__()
 
+    def __eq__(self, other):
+        if isinstance(other, Arc):
+            return self.__a == other.__a and self.__b == other.__b and self._weight == other._weight
+        return False
+
+    def __ne__(self, other):
+        if isinstance(other, Arc):
+            return not (self.__a == other.__a and self.__b == other.__b and self._weight == other._weight)
+        return True
+
     def a(self):
         return self.__a
 
@@ -28,30 +38,90 @@ class Arc:
 
 class Graph:
     def __init__(self, nodes=None, arcs=None):
-        self.__nodes = nodes if nodes else set()  # int
-        self.__arcs = arcs if arcs else set()     # Arc
-        for a in arcs:
-            for n in a:
-                if n not in self.__nodes:
-                    raise ValueError
+        if (nodes is None or len(nodes) == 0) and arcs is not None and len(arcs) > 0:  # can not add arcs without nodes
+            raise ValueError
+
+        if nodes is not None and not isinstance(nodes, set):
+            raise TypeError("Parameter of wrong type = " + str(type(nodes)) + " is passed")
+
+        if arcs is not None and not isinstance(arcs, set):
+            raise TypeError("Parameter of wrong type = " + str(type(nodes)) + " is passed")
+
+        self.__nodes = nodes if nodes is not None else set()  # int
+
+        if arcs is not None:
+            for a in arcs:
+                for n in a:
+                    if n not in self.__nodes:
+                        raise ValueError
+
+        self.__arcs = arcs if arcs is not None else set()     # Arc
 
     def addnode(self, node):
+        if node is None:
+            return
+
+        if not isinstance(node, int):
+            raise TypeError("Parameter of wrong type is passed")
+
         if node not in self.__nodes:
             self.__nodes.add(node)
 
     def addarc(self, arc):
+        if arc is None:
+            return
+
+        if not isinstance(arc, Arc):
+            raise TypeError("Parameter of wrong type is passed")
+
         if arc not in self.__arcs:
+            for node in arc:
+                if node not in self.__nodes:
+                    raise ValueError
+
             self.__nodes.add(arc)
 
     def delarc(self, arc):
+        if arc is None:
+            return
+
+        if not isinstance(arc, Arc):
+            raise TypeError("Parameter of wrong type is passed")
+
         if arc in self.__arcs:
             self.__arcs.remove(arc)
 
     def delnode(self, node):
+        if node is None:
+            return
+
+        if not isinstance(node, int):
+            raise TypeError("Parameter of wrong type is passed")
+
         if node in self.__nodes:
             self.__nodes.remove(node)
 
+        arcs_to_delete = []  # remove all arc with deleted node
+        for arc in self.__arcs:
+            for n in arc:
+                if n == node:
+                    arcs_to_delete.append(arc)
+                    break
+
+        while len(arcs_to_delete) != 0:
+            self.__arcs.remove(arcs_to_delete[0])
+            arcs_to_delete.remove(arcs_to_delete[0])
+
     def getarcs(self, node):
+        if node is None:
+            raise ValueError("node ca not be None")
+
+        if not isinstance(node, int):
+            raise TypeError("Parameter of wrong type is passed")
+
+        if node not in self.__nodes:
+            raise ValueError("Node is not exist")
+
         arcs = set()
         for a in self.__arcs:
             if a.a() == node:
