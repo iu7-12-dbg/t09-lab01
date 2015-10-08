@@ -21,11 +21,6 @@ class Arc:
             return self.__a == other.__a and self.__b == other.__b and self._weight == other._weight
         return False
 
-    def __ne__(self, other):
-        if isinstance(other, Arc):
-            return not (self.__a == other.__a and self.__b == other.__b and self._weight == other._weight)
-        return True
-
     def a(self):
         return self.__a
 
@@ -101,16 +96,10 @@ class Graph:
         if node in self.__nodes:
             self.__nodes.remove(node)
 
-        arcs_to_delete = []  # remove all arc with deleted node
-        for arc in self.__arcs:
-            for n in arc:
-                if n == node:
-                    arcs_to_delete.append(arc)
-                    break
+        arcs_to_delete = [arc for arc in self.__arcs if node in arc]
 
-        while len(arcs_to_delete) != 0:
-            self.__arcs.remove(arcs_to_delete[0])
-            arcs_to_delete.remove(arcs_to_delete[0])
+        for arc in arcs_to_delete:
+            self.__arcs.remove(arc)
 
     def getarcs(self, node):
         if node is None:
