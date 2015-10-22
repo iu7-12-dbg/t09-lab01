@@ -1,31 +1,61 @@
 # coding UTF-8
+import math, sys
+INF = sys.maxsize
+
+
+"""
+    Отнаследовался от int, чтобы "унифицировать" все
+    поэтому метод init не нужен - int статичен и определяется в new
+"""
+
+
+class Node(int):
+    def __new__(cls, val, **kwargs):
+        self = super(Node, cls).__new__(cls, val)
+        key = kwargs.get('type', None)
+        if not key:
+            raise Exception('give a type arg')
+        if key == 'coord':
+            self._x = kwargs['x']
+            self._y = kwargs['y']
+            self._type = key
+            self.h = self.__coord_hfun
+        return self
+
+    def __coord_hfun(self, other):
+        if not isinstance(other, Node):
+            raise TypeError()
+        val = (self._x - other._x) ** 2 + (self._y - other._y) ** 2
+        return math.sqrt(val)
 
 
 class Arc:
     def __init__(self, a, b, weight):  # конструктор
-        self.__a = a
-        self.__b = b
+        self._a = a
+        self._b = b
         self._weight = weight
 
     def __str__(self):  # это для консоли
         return str((self.a(), self.b(), self._weight))
 
     def __hash__(self):
-        return self.__a * (2 ** 16) + self.__b
+        return self._a * (2 ** 16) + self._b
 
     def __iter__(self):
-        return [self.__a, self.__b].__iter__()
+        # return [self._a, self._b].__iter__()
+        yield self._a
+        yield self._b
 
     def __eq__(self, other):
         if isinstance(other, Arc):
-            return self.__a == other.__a and self.__b == other.__b and self._weight == other._weight
+            return self._a == other.a() and self._b == other.b() and self._weight == other.w()
         return False
 
     def a(self):
-        return self.__a
+        return self._a
 
     def b(self):
-        return self.__b
+        return self._b
 
     def w(self):
         return self._weight
@@ -50,7 +80,7 @@ class Graph:
                     if n not in self.__nodes:
                         raise ValueError
 
-        self.__arcs = arcs if arcs is not None else set()     # Arc
+        self._arcs = arcs if arcs is not None else set()     # Arc
 
     def addnode(self, node):
         if node is None:
@@ -69,7 +99,7 @@ class Graph:
         if not isinstance(arc, Arc):
             raise TypeError("Parameter of wrong type is passed")
 
-        if arc not in self.__arcs:
+        if arc not in self._arcs:
             for node in arc:
                 if node not in self.__nodes:
                     raise ValueError
@@ -83,8 +113,8 @@ class Graph:
         if not isinstance(arc, Arc):
             raise TypeError("Parameter of wrong type is passed")
 
-        if arc in self.__arcs:
-            self.__arcs.remove(arc)
+        if arc in self._arcs:
+            self._arcs.remove(arc)
 
     def delnode(self, node):
         if node is None:
@@ -96,10 +126,10 @@ class Graph:
         if node in self.__nodes:
             self.__nodes.remove(node)
 
-        arcs_to_delete = [arc for arc in self.__arcs if node in arc]
+        arcs_to_delete = [arc for arc in self._arcs if node in arc]
 
         for arc in arcs_to_delete:
-            self.__arcs.remove(arc)
+            self._arcs.remove(arc)
 
     def getarcs(self, node):
         if node is None:
@@ -112,13 +142,20 @@ class Graph:
             raise ValueError("Node is not exist")
 
         arcs = set()
-        for a in self.__arcs:
+        for a in self._arcs:
             if a.a() == node:
                 arcs.add(a)
         return arcs
 
     def arcs(self):
-        return self.__arcs.copy()
+        return self._arcs.copy()
 
     def nodes(self):
         return self.__nodes.copy()
+
+    def neighbors(self, node):
+        for arc in self.getarcs(node):
+            if arc.a() == node:
+                yield (arc.b(), arc.w())
+            else:
+                yield (arc.a(), arc.w())

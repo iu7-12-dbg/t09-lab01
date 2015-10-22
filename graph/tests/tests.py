@@ -1,6 +1,7 @@
 import unittest, random
 from graph.graph import *
 from graph.dijkstra import *
+from graph.astar import *
 
 
 class TestArc(unittest.TestCase):
@@ -213,6 +214,31 @@ class TestGraph(unittest.TestCase):
     def testGetArcsOfExistingNode(self):
         arcs = {Arc(1, 2, 10)}
         self.assertEqual(Graph({1, 2, 3}, arcs).getarcs(1), arcs, "Getting arcs FAILED")
+
+    def testAstar1(self):
+        start = Node(1, type='coord', x=0, y=0)
+        end = Node(4, type='coord', x=10, y=10)
+        node2 = Node(2, type='coord', x=10, y=0)
+        node3 = Node(3, type='coord', x=0, y=10)
+        nodes = {start, node2, node3, end}
+        arcs = {Arc(start, node2, 1), Arc(node2, node3, 2), Arc(node3, end, 1),}
+        g = Graph(nodes, arcs)
+        astar = AStar(g)
+        res = astar.start(start, end)
+        self.assertEqual(res, [4, 3, 2, 1], '...')
+
+    def testAstar2(self):
+        start = Node(1, type='coord', x=0, y=0)
+        end = Node(4, type='coord', x=10, y=10)
+        node2 = Node(2, type='coord', x=10, y=0)
+        node3 = Node(3, type='coord', x=0, y=10)
+        nodes = {start, node2, node3, end}
+        arcs = {Arc(start, node2, 1), Arc(node2, node3, 2), Arc(node3, end, 1),
+                Arc(start, end, 1)}
+        g = Graph(nodes, arcs)
+        astar = AStar(g)
+        res = astar.start(start, end)
+        self.assertEqual(res, [4, 1], '...')
 
 
 if __name__ == "__main__":

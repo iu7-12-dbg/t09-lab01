@@ -1,6 +1,5 @@
 import sys
-__author__ = 'cerg'
-INF = sys.maxsize
+from graph.graph import *
 
 
 class Dijkstra:
@@ -42,7 +41,6 @@ class Dijkstra:
             raise ValueError
         self.__start(node)
         return self.result()
-
 
 
 
