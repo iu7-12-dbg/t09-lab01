@@ -12,9 +12,7 @@ INF = sys.maxsize
 class Node(int):
     def __new__(cls, val, **kwargs):
         self = super(Node, cls).__new__(cls, val)
-        key = kwargs.get('type', None)
-        if not key:
-            raise Exception('give a type arg')
+        key = kwargs.get('type', 'coord')
         if key == 'coord':
             self._x = kwargs['x']
             self._y = kwargs['y']
@@ -27,6 +25,11 @@ class Node(int):
             raise TypeError()
         val = (self._x - other._x) ** 2 + (self._y - other._y) ** 2
         return math.sqrt(val)
+
+    @classmethod
+    def from_dict(cls, d):
+        n = Node(d['value'], type='coord', x=d['x'], y=d['y'])
+        return n
 
 
 class Arc:
@@ -60,6 +63,18 @@ class Arc:
     def w(self):
         return self._weight
 
+    @classmethod
+    def getnode(cls, nodes, number):
+        a = filter(lambda x: x == number, nodes)
+        for b in a:
+            return b
+
+    @classmethod
+    def from_dict(cls, d, nodes):
+        a = cls.getnode(nodes, d['a'])
+        b = cls.getnode(nodes, d['b'])
+        arc = cls(a, b, d['w'])
+        return arc
 
 class Graph:
     def __init__(self, nodes=None, arcs=None):
