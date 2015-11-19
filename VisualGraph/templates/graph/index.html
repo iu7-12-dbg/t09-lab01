@@ -26,6 +26,11 @@
             <div id="inputControls">
                 <button type="submit" id="saveGraphButton" onclick="onSaveGraphButtonClicked()">Save Graph</button>
             </div>
+            <div id="findGraph">
+                <input type="text" class="nodeInput" id="graphId" placeholder="Graph id">
+                <button type="submit" id="findGraphButton" onclick="document.location='/graph/'+
+                    document.getElementById('graphId').value">Search</button>
+            </div>
         </div>
     </div>
 </div>
