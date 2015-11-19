@@ -4,7 +4,7 @@
 var Constants = {
     pathColor : "#FFB942",
     graphColor : "#1AC7B2",
-    graphInputRegExp: /^\s*nodes\s*:\s*([\d]+\s*,\s*)*\s*[\d]+\s*;\s*arcs\s*:\s*([\d]+\s*->\s*[\d]+\s*\[[\d]+]\s*,)*\s*[\d]+\s*->\s*[\d]+\s*\[[\d]+]\s*$/,
+    graphInputRegExp: /^\s*nodes\s*:\s*([\d]+\s*\[\s*[\d]+\s*:\s*[\d]+\s*]\s*,\s*)*\s*[\d]+\s*\[\s*[\d]+\s*:\s*[\d]+\s*]\s*;\s*arcs\s*:\s*([\d]+\s*->\s*[\d]+\s*\[[\d]+]\s*,)*\s*[\d]+\s*->\s*[\d]+\s*\[\s*[\d]+\s*]\s*$/,
     maxNodeCoordinateValue: 100
 };
 
@@ -45,6 +45,10 @@ function redrawGraph(graphJSON, path) {
         return;
     }
 
+    if (typeof path == 'string') {
+        path = JSON.parse(path);
+    }
+
     var arcs = [];
     var nodes = [];
 
@@ -53,7 +57,7 @@ function redrawGraph(graphJSON, path) {
         nodes.push(
             {
                 id: node.value,
-                label : node.value,
+                label : node.value + '[' + node.x + ',' + node.y + ']',
                 color : (path != undefined && path.indexOf(node.value) > -1) ?
                          Constants.pathColor : Constants.graphColor
             }
@@ -131,10 +135,11 @@ function getGraphJSONFromInput() {
         var nodes = input[0].replace(/\s*/, '').replace('nodes:', '').split(',');
 
         for (var i = 0; i < nodes.length; ++i) {
+            var xy = nodes[i].replace(/[\d]+\[/, '').replace(']', '').split(':');
             graph.nodes.push({
-                value: parseInt(nodes[i]),
-                x: Math.random() * Constants.maxNodeCoordinateValue,
-                y: Math.random() * Constants.maxNodeCoordinateValue
+                value: parseInt(nodes[i].replace(/\[.*]/, '')),
+                x: parseInt(xy[0]),
+                y: parseInt(xy[1])
             });
         }
 
