@@ -1,5 +1,5 @@
 # coding UTF-8
-import math, sys
+import math, sys, json
 INF = sys.maxsize
 
 
@@ -75,6 +75,17 @@ class Arc:
         b = cls.getnode(nodes, d['b'])
         arc = cls(a, b, d['w'])
         return arc
+
+
+def graph_from_text(text):
+    obj = json.loads(text)
+    nodes = obj['nodes']
+    arcs = obj['arcs']
+    nodes = {Node.from_dict(n) for n in nodes}
+    arcs = {Arc.from_dict(a, nodes) for a in arcs}
+    g = Graph(nodes, arcs)
+    return g
+
 
 class Graph:
     def __init__(self, nodes=None, arcs=None):

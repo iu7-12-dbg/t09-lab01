@@ -225,7 +225,7 @@ class TestGraph(unittest.TestCase):
         g = Graph(nodes, arcs)
         astar = AStar(g)
         res = astar.start(start, end)
-        self.assertEqual(res, [4, 3, 2, 1], '...')
+        self.assertEqual(res, [4, 3, 2, 1], 'неверный путь')
 
     def testAstar2(self):
         start = Node(1, type='coord', x=0, y=0)
@@ -238,8 +238,31 @@ class TestGraph(unittest.TestCase):
         g = Graph(nodes, arcs)
         astar = AStar(g)
         res = astar.start(start, end)
-        self.assertEqual(res, [4, 1], '...')
+        self.assertEqual(res, [4, 1], 'неверный путь')
 
+    def testAstar3(self):
+        start = Node(1, type='coord', x=0, y=0)
+        end = Node(4, type='coord', x=10, y=10)
+        node2 = Node(2, type='coord', x=10, y=0)
+        node3 = Node(3, type='coord', x=0, y=10)
+        nodes = {start, node2, node3, end}
+        arcs = {Arc(start, end, 100), Arc(start, node2, 1), Arc(node2, node3, 2), Arc(node3, end, 1)}
+        g = Graph(nodes, arcs)
+        astar = AStar(g)
+        res = astar.start(start, end)
+        self.assertEqual(res, [4, 3, 2, 1], 'неверный путь')
+
+    def testAstar4(self):
+        start = Node(1, type='coord', x=0, y=0)
+        end = Node(4, type='coord', x=10, y=10)
+        node2 = Node(2, type='coord', x=10, y=0)
+        node3 = Node(3, type='coord', x=0, y=10)
+        nodes = {start, node2, node3, end}
+        arcs = {Arc(start, node2, 1), Arc(node2, node3, 2)}
+        g = Graph(nodes, arcs)
+        astar = AStar(g)
+        res = astar.start(start, end)
+        self.assertEqual(res, [], 'Нет пути')
 
 if __name__ == "__main__":
     unittest.main()

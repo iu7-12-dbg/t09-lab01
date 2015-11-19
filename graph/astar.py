@@ -2,6 +2,12 @@
 from graph.graph import *
 
 
+def getNode(nodes, number):
+    a = filter(lambda x: x == number, nodes)
+    for b in a:
+        return b
+
+
 class AStar:
     def __init__(self, g):
         if not isinstance(g, Graph):
