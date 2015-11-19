@@ -3,6 +3,7 @@ from django.template import RequestContext, loader
 from django.views.generic import View
 from VisualGraph.models import *
 from graph.astar import *
+from graph.graph import *
 import json
 
 
@@ -35,28 +36,16 @@ class GraphView:
         return HttpResponse(':'.join(['id', str(gr.id)]))
 
 
-def getNode(nodes, number):
-    a = filter(lambda x: x == number, nodes)
-    for b in a:
-        return b
-
-
 def solve_graph(request, pk, a, b):
-        obj = GraphModel.objects.get(id=pk).text
-        obj = json.loads(obj)
-        nodes = obj['nodes']
-        arcs = obj['arcs']
-        nodes = {Node.from_dict(n) for n in nodes}
-        arcs = {Arc.from_dict(a, nodes) for a in arcs}
-        g = Graph(nodes, arcs)
+        text = GraphModel.objects.get(id=pk).text
+        g = graph_from_text(text)
         ast = AStar(g)
         a, b = int(a), int(b)
-        a = getNode(nodes, a)
-        b = getNode(nodes, b)
+        a = getNode(g.nodes(), a)
+        b = getNode(g.nodes(), b)
         res = ast.start(a, b)
         res = json.dumps(res)
         return HttpResponse(res)
-
 
 
 def index(request):
